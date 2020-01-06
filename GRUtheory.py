@@ -54,7 +54,7 @@ def Eerf2(mu, var):
                            upper=FV(np.array([0, 0])),
                            mean=mean, sigma=var))
     return (ppprob + nnprob - pnprob - npprob)[0]
-    
+
 def Esigmoidprod(signs, mu, cov):
     r'''
     Computes
@@ -115,11 +115,11 @@ def thgru(ingram, varUz=1, varUr=1, varUh=1,
     with covariance `ingram`.
     An erf-GRU evolves according to the equations
     
-        \tilde z^t = W_z x^t + U_z h^{t-1} + b_z
+        \tilde z^t = U_z x^t + W_z h^{t-1} + b_z
         z^t = sigmoid(\tilde z^t)
-        \tilde r^t = W_r x^t + U_r h^{t-1} + b_r
+        \tilde r^t = U_r x^t + W_r h^{t-1} + b_r
         r^t = sigmoid(\tilde r^t)
-        \tilde h^t = W_h x^t + U_h(h^{t-1} \odot r^t) + b_h
+        \tilde h^t = U_h x^t + W_h(h^{t-1} \odot r^t) + b_h
         h^t = (1 - z^t) \odot h^{t-1} + z^t \odot erf(\tilde h^t)
         
     where
@@ -130,8 +130,8 @@ def thgru(ingram, varUz=1, varUr=1, varUh=1,
                                 0 means h^t = h^{t-1}
         r^t is ``reset gate'':
             the smaller, the easier to make proposed update not depend on h^{t-1}
-        W_z, W_r, W_h are weights converting input to hidden states
-        U_z, U_r, U_h are weights converting state to state
+        U_z, U_r, U_h are weights converting input to hidden states
+        W_z, W_r, W_h are weights converting state to state
         b_z, b_r, b_h are biases    
         sigmoid(x) = (1 + erf(x)) / 2
         
@@ -191,8 +191,8 @@ def thgru(ingram, varUz=1, varUr=1, varUh=1,
         if t < s:
             return covhtht(s, t)
         # covhtht(1, 1) inolves the first token, ingram[0, 0]
-        _covhtht[(t, s)] = varWh * ingram[t-1, s-1] + \
-            varUh * Ehh(t-1, s-1) * Err(t, s) + varbh
+        _covhtht[(t, s)] = varUh * ingram[t-1, s-1] + \
+            varWh * Ehh(t-1, s-1) * Err(t, s) + varbh
         return _covhtht[(t, s)]
     # Ess(t, s) = E erf(\tilde h^t) erf(\tilde h^s)
     _Ess = {}
@@ -257,8 +257,8 @@ def thgru(ingram, varUz=1, varUr=1, varUh=1,
         if t < s:
             return covztzt(s, t)
         # covztzt(1, 1) inolves the first token, ingram[0, 0]
-        _covztzt[(t, s)] = varWz * ingram[t-1, s-1] \
-                + varUz * Ehh(t-1, s-1) + varbz
+        _covztzt[(t, s)] = varUz * ingram[t-1, s-1] \
+                + varWz * Ehh(t-1, s-1) + varbz
         return _covztzt[(t, s)]
     # covrtrt(t, s) = covariance(\tilde r^t, \tilde r^s)
     _covrtrt = {}
@@ -268,8 +268,8 @@ def thgru(ingram, varUz=1, varUr=1, varUh=1,
         if t < s:
             return covrtrt(s, t)
         # covrtrt(1, 1) inolves the first token, ingram[0, 0]
-        _covrtrt[(t, s)] = varWr * ingram[t-1, s-1] \
-                + varUr * Ehh(t-1, s-1) + varbr
+        _covrtrt[(t, s)] = varUr * ingram[t-1, s-1] \
+                + varWr * Ehh(t-1, s-1) + varbr
         return _covrtrt[(t, s)]
     # Err(t, s) = E r^t r^s
     _Err = {}
@@ -344,8 +344,8 @@ def thgru2(in1covs, in2covs, ingramx,
         if (t, s) in _covhtht:
             return _covhtht[(t, s)]
         # covhtht(1, 1) inolves the first token, ingram[0, 0]
-        _covhtht[(t, s)] = varWh * ingramx[t-1, s-1] + \
-            varUh * Ehh(t-1, s-1) * Err(t, s) + varbh
+        _covhtht[(t, s)] = varUh * ingramx[t-1, s-1] + \
+            varWh * Ehh(t-1, s-1) * Err(t, s) + varbh
         return _covhtht[(t, s)]
     # Ess(t, s) = E erf(\tilde h1^t) erf(\tilde h2^s)
     _Ess = {}
@@ -403,8 +403,8 @@ def thgru2(in1covs, in2covs, ingramx,
         if (t, s) in _covztzt:
             return _covztzt[(t, s)]
         # covztzt(1, 1) inolves the first token, ingram[0, 0]
-        _covztzt[(t, s)] = varWz * ingramx[t-1, s-1] \
-                + varUz * Ehh(t-1, s-1) + varbz
+        _covztzt[(t, s)] = varUz * ingramx[t-1, s-1] \
+                + varWz * Ehh(t-1, s-1) + varbz
         return _covztzt[(t, s)]
     # covrtrt(t, s) = covariance(\tilde r1^t, \tilde r2^s)
     _covrtrt = {}
@@ -412,8 +412,8 @@ def thgru2(in1covs, in2covs, ingramx,
         if (t, s) in _covrtrt:
             return _covrtrt[(t, s)]
         # covrtrt(1, 1) inolves the first token, ingram[0, 0]
-        _covrtrt[(t, s)] = varWr * ingramx[t-1, s-1] \
-                + varUr * Ehh(t-1, s-1) + varbr
+        _covrtrt[(t, s)] = varUr * ingramx[t-1, s-1] \
+                + varWr * Ehh(t-1, s-1) + varbr
         return _covrtrt[(t, s)]
     # Err(t, s) = E r1^t r2^s
     _Err = {}

@@ -14,8 +14,6 @@ Despite what the title suggests, this repo does not implement the infinite-width
 - [Transformer](Transformer.ipynb)
 - [Batchnorm+ReLU Fully-Connected Network](Batchnorm.ipynb)
 
-Note that github does not render the notebooks correctly in a webpage, so please download them and run locally.
-
 [Plots.ipynb](Plots.ipynb) also reproduces Figure (3) of the paper.
 
 We have included the GloVe embeddings `ExampleGloVeVecs.npy` of example sentences we feed into the networks, as well as their normalized Gram matrix `ExampleGloVeCov.npy`.
