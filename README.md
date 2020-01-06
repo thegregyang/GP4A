@@ -9,10 +9,12 @@ which shows that the Gaussian process behavior arises in wide, randomly initiali
 
 Despite what the title suggests, this repo does not implement the infinite-width GP kernel for every architecture, but rather demonstrates the derivation and implementation for a few select architectures.
 
-- [Simple RNN](RNN.ipynb)
-- [GRU](GRU.ipynb)
-- [Transformer](Transformer.ipynb)
-- [Batchnorm+ReLU Fully-Connected Network](Batchnorm.ipynb)
+Architecture        | Notebook                     | Colab
+--------------------|------------------------------|-------
+Simple RNN          | [Notebook](RNN.ipynb)        |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/thegregyang/GP4A/blob/master/colab/RNN.ipynb)
+GRU                 | [Notebook](GRU.ipynb)        | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/thegregyang/GP4A/blob/master/colab/GRU.ipynb)
+Transformer         | [Notebook](Transformer.ipynb)| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/thegregyang/GP4A/blob/master/colab/Transformer.ipynb)
+Batchnorm+ReLU MLP  | [Notebook](Batchnorm.ipynb)  | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/thegregyang/GP4A/blob/master/colab/Batchnorm.ipynb)
 
 [Plots.ipynb](Plots.ipynb) also reproduces Figure (3) of the paper.
 
