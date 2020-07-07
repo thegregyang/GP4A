@@ -69,13 +69,14 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
             h1 = tildeh1 + U @ x1 + b
             s1 = phi(h1)
 
-            x2 = np.array(seq[seqlen-n])
+            x2 = np.array(seq[seqlen-n-1])
             h2 = tildeh2 + U @ x2 + b
             s2 = phi(h2)
 
-            ss.append(np.array(s1, s2))
+            ss.append(np.concatenate((s1, s2)))
+            # ss.append(s1)
 
             tildeh1 = W @ s1
             tildeh2 = W @ s2
-
+    
     return varv * seqs2cov(ss)

@@ -51,15 +51,38 @@ def thbirnn(ingram, inputidxs, Vphi,
     Outputs:
         The kernel of the Gaussian distribution described above.
     '''
+
+    ingram_b = np.zeros(ingram.shape)
+    ingram_b[:7, :7] = ingram[:7, :7][::-1, ::-1].T
+    ingram_b[7:, 7:] = ingram[7:, 7:][::-1, ::-1].T
+    ingram_b[:7, 7:] = ingram[7:, :7][::-1, ::-1].T
+    ingram_b[7:, :7] = ingram[:7, 7:][::-1, ::-1].T
+    # ingram_b[:7, 7:] = ingram[:7, 7:][::-1, ::-1]
+    # ingram_b[7:, :7] = ingram[7:, :7][::-1, ::-1]
+    
+
     if maxlength is None:
         maxlength = 0
         for i in range(len(inputidxs)-1):
             maxlength = max(maxlength, inputidxs[i+1]-inputidxs[i])
-    hcov = np.zeros(ingram.shape)
-    hhcov = np.zeros(ingram.shape)
+
+    hcov1 = np.zeros(ingram.shape)
+    hhcov1 = np.zeros(ingram.shape)
+
+    hcov2 = np.zeros(ingram.shape)
+    hhcov2 = np.zeros(ingram.shape)
+
     for _ in range(maxlength):
-        hhcov[1:, 1:] = hcov[:-1, :-1]
-        hhcov[inputidxs, :] = hhcov[:, inputidxs] = 0
-        hhcov += varu * ingram + varb
-        hcov = varw * Vphi(hhcov)
-    return varv * hcov
+        hhcov1[1:, 1:] = hcov1[:-1, :-1]
+        hhcov1[inputidxs, :] = hhcov1[:, inputidxs] = 0
+        hhcov1 += varu * ingram + varb
+        hcov1 = varw * Vphi(hhcov1)
+        
+        hhcov2[1:, 1:] = hcov2[:-1, :-1]
+        hhcov2[inputidxs, :] = hhcov2[:, inputidxs] = 0
+        hhcov2 += varu * ingram_b + varb
+        hcov2 = varw * Vphi(hhcov2)
+
+        # hcov1 = hcov2= hcov1+hcov2
+        
+    return varv * (hcov1+hcov2) / 2
