@@ -8,15 +8,18 @@ def thbirnn(ingram, inputidxs, Vphi,
     Computes the infinite-width GP kernel of a bidirectional erf-RNN over input sequences
     with normalized Gram matrix `ingram`.
 
-    A simple RNN with scalar output every time step evolves like
+    A bidirectional RNN with scalar output every time step evolves like
 
-        s^t = nonlin(W s^{t-1} + U x^{t} + b)
-        y^t = <v, s^t>
+        s^t_f = nonlin(W s^{t-1}_f + U x^{t}_f + b)
+        s^t_b = nonlin(W s^{t-1}_b + U x^{t}_b + b)
+        y^t = <v, (s^t_f, s^t_b) >
 
     where
 
-        x^t is the input at time t
-        s^t is the state of the RNN at time t
+        x^t_f is the input at time t
+        x^t_b is the input at time t
+        s^t_f is the forward state of the RNN at time t
+        s^t_b is the backward state of the RNN at time t
         W is the state-to-state weight matrix
         U is the input-to-state weight matrix
         b is the bias
@@ -57,9 +60,6 @@ def thbirnn(ingram, inputidxs, Vphi,
     ingram_b[7:, 7:] = ingram[7:, 7:][::-1, ::-1].T
     ingram_b[:7, 7:] = ingram[7:, :7][::-1, ::-1].T
     ingram_b[7:, :7] = ingram[:7, 7:][::-1, ::-1].T
-    # ingram_b[:7, 7:] = ingram[:7, 7:][::-1, ::-1]
-    # ingram_b[7:, :7] = ingram[7:, :7][::-1, ::-1]
-    
 
     if maxlength is None:
         maxlength = 0
@@ -82,7 +82,4 @@ def thbirnn(ingram, inputidxs, Vphi,
         hhcov2[inputidxs, :] = hhcov2[:, inputidxs] = 0
         hhcov2 += varu * ingram_b + varb
         hcov2 = varw * Vphi(hhcov2)
-
-        # hcov1 = hcov2= hcov1+hcov2
-        
     return varv * (hcov1+hcov2) / 2

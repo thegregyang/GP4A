@@ -74,7 +74,7 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
             s2 = phi(h2)
 
             ss.append(np.concatenate((s1, s2)))
-            # ss.append(s1)
+            # ss.append(s1+s2)
 
             tildeh1 = W @ s1
             tildeh2 = W @ s2
