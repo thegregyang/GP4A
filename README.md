@@ -1,5 +1,11 @@
 # Gaussian Process for Any Neural Architecture: Reference Implementations
 
+*Update July 2020*
+
+The 2nd paper in the Tensor Programs series, [*Neural Tangent Kernel for Any Architecture*](https://arxiv.org/abs/2006.14548), is now out! It shows that the *infinite-width limit* of a neural network of any architecture is well-defined (in the technical sense that the [tangent kernel (NTK)](https://arxiv.org/abs/1806.07572) of any randomly initialized neural network converges in the large width limit) and can be computed. The [associated repo](https://github.com/thegregyang/NTK4A) implements this infinite-width neural network for RNN, Transformer, and a Batchnorm+ReLU MLP.
+
+--------------------------------------------
+
 This repo is a companion to the paper
 
 [**Tensor Programs I: Wide Feedforward or Recurrent Neural Networks of Any Architecture are Gaussian Processes**](https://arxiv.org/abs/1910.12478)<br>
