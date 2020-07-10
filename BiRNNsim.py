@@ -6,18 +6,24 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
     '''Samples a finite-width GP kernel of a bidirectional RNN over input sequences `inputseqs`.
     A simple RNN with scalar output every time step evolves like
 
-        s^t = phi(W s^{t-1} + U x^{t} + b)
-        y^t = <v, s^t>
+    A bidirectional RNN with scalar output every time step evolves like
+
+        s^t_f = nonlin(W s^{t-1}_f + U x^{t}_f + b)
+        s^t_b = nonlin(W s^{t-1}_b + U x^{t}_b + b)
+        y^t = <v, (s^t_f, s^t_b) >
 
     where
 
-        x^t is the input at time t
-        s^t is the state of the RNN at time t
+        x^t_f is the forward input at time t
+        x^t_b is the backward input at time t
+        s^t_f is the forward state of the RNN at time t
+        s^t_b is the backward state of the RNN at time t
         W is the state-to-state weight matrix
         U is the input-to-state weight matrix
         b is the bias
         v is the readout weight
         y^t is the output at time t
+        nonlin = erf in the case of erf-RNN here
 
     If n is the number of neurons and x^t has dimension m, and
 
@@ -62,21 +68,20 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
     ss = []
     for seq in inputseqs:
         seqlen = len(seq)
-        tildeh1 = 0
-        tildeh2 = 0
+        tildeh_f = 0
+        tildeh_b = 0
         for n in range(seqlen):
-            x1 = np.array(seq[n])
-            h1 = tildeh1 + U @ x1 + b
-            s1 = phi(h1)
+            x_f = np.array(seq[n])
+            h_f = tildeh_f + U @ x_f + b
+            s_f = phi(h_f)
 
-            x2 = np.array(seq[seqlen-n-1])
-            h2 = tildeh2 + U @ x2 + b
-            s2 = phi(h2)
+            x_b = np.array(seq[seqlen-n-1])
+            h_b = tildeh_b + U @ x_b + b
+            s_b = phi(h_b)
 
-            ss.append(np.concatenate((s1, s2)))
-            # ss.append(s1+s2)
+            ss.append(np.concatenate((s_f, s_b)))
 
-            tildeh1 = W @ s1
-            tildeh2 = W @ s2
+            tildeh_f = W @ s_f
+            tildeh_b = W @ s_b
     
     return varv * seqs2cov(ss)

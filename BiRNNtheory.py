@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def thbirnn(ingram, inputidxs, Vphi,
             varw=1, varu=1, varb=0, varv=1,
             maxlength=None):
@@ -16,8 +15,8 @@ def thbirnn(ingram, inputidxs, Vphi,
 
     where
 
-        x^t_f is the input at time t
-        x^t_b is the input at time t
+        x^t_f is the forward input at time t
+        x^t_b is the backward input at time t
         s^t_f is the forward state of the RNN at time t
         s^t_b is the backward state of the RNN at time t
         W is the state-to-state weight matrix
@@ -56,30 +55,31 @@ def thbirnn(ingram, inputidxs, Vphi,
     '''
 
     ingram_b = np.zeros(ingram.shape)
-    ingram_b[:7, :7] = ingram[:7, :7][::-1, ::-1].T
-    ingram_b[7:, 7:] = ingram[7:, 7:][::-1, ::-1].T
-    ingram_b[:7, 7:] = ingram[7:, :7][::-1, ::-1].T
-    ingram_b[7:, :7] = ingram[:7, 7:][::-1, ::-1].T
+    loc = inputidxs[1]
+    ingram_b[:loc, :loc] = ingram[:loc, :loc][::-1, ::-1].T
+    ingram_b[loc:, loc:] = ingram[loc:, loc:][::-1, ::-1].T
+    ingram_b[:loc, loc:] = ingram[loc:, :loc][::-1, ::-1].T
+    ingram_b[loc:, :loc] = ingram[:loc, loc:][::-1, ::-1].T
 
     if maxlength is None:
         maxlength = 0
         for i in range(len(inputidxs)-1):
             maxlength = max(maxlength, inputidxs[i+1]-inputidxs[i])
 
-    hcov1 = np.zeros(ingram.shape)
-    hhcov1 = np.zeros(ingram.shape)
+    hcov_f = np.zeros(ingram.shape)
+    hhcov_f = np.zeros(ingram.shape)
 
-    hcov2 = np.zeros(ingram.shape)
-    hhcov2 = np.zeros(ingram.shape)
+    hcov_b = np.zeros(ingram.shape)
+    hhcov_b = np.zeros(ingram.shape)
 
     for _ in range(maxlength):
-        hhcov1[1:, 1:] = hcov1[:-1, :-1]
-        hhcov1[inputidxs, :] = hhcov1[:, inputidxs] = 0
-        hhcov1 += varu * ingram + varb
-        hcov1 = varw * Vphi(hhcov1)
+        hhcov_f[1:, 1:] = hcov_f[:-1, :-1]
+        hhcov_f[inputidxs, :] = hhcov_f[:, inputidxs] = 0
+        hhcov_f += varu * ingram + varb
+        hcov_f = varw * Vphi(hhcov_f)
         
-        hhcov2[1:, 1:] = hcov2[:-1, :-1]
-        hhcov2[inputidxs, :] = hhcov2[:, inputidxs] = 0
-        hhcov2 += varu * ingram_b + varb
-        hcov2 = varw * Vphi(hhcov2)
-    return varv * (hcov1+hcov2) / 2
+        hhcov_b[1:, 1:] = hcov_b[:-1, :-1]
+        hhcov_b[inputidxs, :] = hhcov_b[:, inputidxs] = 0
+        hhcov_b += varu * ingram_b + varb
+        hcov_b = varw * Vphi(hhcov_b)
+    return varv * (hcov_f+hcov_b) / 2
