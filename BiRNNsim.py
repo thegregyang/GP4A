@@ -1,7 +1,6 @@
 import numpy as np
 from utils import seqs2cov
 
-
 def simbirnn(inputseqs, width, phi, mergemode, varw, varu, varb, varv=1, seed=None):
     '''Samples a finite-width GP kernel of a bidirectional RNN over input sequences `inputseqs`.
     A simple RNN with scalar output every time step evolves like
