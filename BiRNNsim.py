@@ -2,7 +2,7 @@ import numpy as np
 from utils import seqs2cov
 
 
-def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
+def simbirnn(inputseqs, width, phi, mergemode, varw, varu, varb, varv=1, seed=None):
     '''Samples a finite-width GP kernel of a bidirectional RNN over input sequences `inputseqs`.
     A simple RNN with scalar output every time step evolves like
 
@@ -10,7 +10,7 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
 
         s^t_f = nonlin(W s^{t-1}_f + U x^{t}_f + b)
         s^t_b = nonlin(W s^{t-1}_b + U x^{t}_b + b)
-        y^t = <v, (s^t_f, s^t_b) >
+        y^t = <v, mergemode(s^t_f, s^t_b) >
 
     where
 
@@ -23,6 +23,7 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
         b is the bias
         v is the readout weight
         y^t is the output at time t
+        mergemode is the method of merging s^t_f and s^t_b, (s^t_f, s^t_b) for concatenation and (s^t_f + s^t_b) for sum
         nonlin = erf in the case of erf-RNN here
 
     If n is the number of neurons and x^t has dimension m, and
@@ -47,6 +48,7 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
                 seqlen x vectordim
         width: number of hidden units; equals n above
         phi: activation function
+        mergemode: method of merging the two hidden states, either "concat" for concatenation or "sum" for sum
         varw: variance of state-to-state weigts
         varu: variance of input-to-state weights
         varb: variance of biases
@@ -79,8 +81,12 @@ def simbirnn(inputseqs, width, phi, varw, varu, varb, varv=1, seed=None):
             h_b = tildeh_b + U @ x_b + b
             s_b = phi(h_b)
 
-            ss.append(np.concatenate((s_f, s_b)))
-            # ss.append(s_f + s_b)
+            if mergemode is "concat":
+                ss.append(np.concatenate((s_f, s_b)))
+            elif mergemode is "sum":
+                ss.append(s_f + s_b)
+            else:
+                raise NotImplementedError()
 
             tildeh_f = W @ s_f
             tildeh_b = W @ s_b
