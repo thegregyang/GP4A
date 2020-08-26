@@ -1,0 +1,5 @@
+.ipynb_checkpoints/
+colab/.ipynb_checkpoints/
+__pycache__
+data/
+.word_vectors_cache/
