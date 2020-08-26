@@ -78,7 +78,7 @@ def thbirnn(ingram, inputidxs, Vphi, mergemode,
             hhcov[..., inputidxs, :] = hhcov[..., :, inputidxs] = 0
             hhcov += varu * coingram + varb
             hcov = varw * Vphi(hhcov)
-        return varv * (hcov[0]+hcov[1]) / 2
+        return varv * (np.sum(hcov, axis=0)) / 2
 
     elif mergemode is "sum":
         loc = inputidxs[1]
